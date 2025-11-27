@@ -13,10 +13,34 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function DashboardContent() {
   const [loading, setLoading] = useState(false);
+
+  // 🔴 Live clock state
+  const [now, setNow] = useState<Date>(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formattedTime = now.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+
+  const formattedDate = now.toLocaleDateString("en-IN", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 
   const metrics = [
     {
@@ -103,7 +127,7 @@ export default function DashboardContent() {
 
   return (
     <div className="space-y-8">
-      {/* Fancy hero banner */}
+      {/* Fancy hero banner with live clock */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-blue-800 to-cyan-500 p-8 text-white shadow-2xl border border-white/10">
         {/* glow blobs */}
         <div className="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full bg-cyan-400/30 blur-3xl" />
@@ -125,6 +149,19 @@ export default function DashboardContent() {
           </div>
 
           <div className="mt-2 md:mt-0 flex flex-col items-start md:items-end gap-3">
+            {/* Live clock card */}
+            <div className="rounded-xl bg-black/40 px-4 py-3 border border-white/15 backdrop-blur-sm min-w-[230px]">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[11px] uppercase tracking-wide text-slate-200/80 flex items-center gap-1">
+                  <span className="inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                  Live dashboard time
+                </p>
+                <span className="text-[10px] text-slate-300">IST</span>
+              </div>
+              <p className="text-xl font-semibold mt-1 tabular-nums">{formattedTime}</p>
+              <p className="text-[11px] text-slate-200/80 mt-1">{formattedDate}</p>
+            </div>
+
             <div className="rounded-xl bg-black/30 px-4 py-3 border border-white/10 backdrop-blur-sm min-w-[230px]">
               <p className="text-[11px] uppercase tracking-wide text-slate-200/80">
                 Today&apos;s snapshot
@@ -141,6 +178,7 @@ export default function DashboardContent() {
                 </span>
               </div>
             </div>
+
             <span className="text-[11px] text-slate-100/70">
               Built with Next.js · Supabase · v0 · For API-first teams
             </span>
